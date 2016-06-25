@@ -10,8 +10,8 @@ Install-Package CodeContractsRemover
 
 Usage
 ============
-```xml
-code_contracts_remover.exe <Convert|Remove> <directorPath> [searchPattern=*.cs] [encoding=utf-8]
+```bash
+code_contracts_remover.exe <Convert|Remove> <directoryPath> [searchPattern=*.cs] [encoding=utf-8]
 ```
 
 #### Convert
