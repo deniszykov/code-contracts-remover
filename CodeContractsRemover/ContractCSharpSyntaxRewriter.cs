@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
@@ -27,11 +28,7 @@ namespace CodeContractsRemover
 		private bool VisitInvocationExpression(InvocationExpressionSyntax node, out StatementSyntax replacementSyntax)
 		{
 			replacementSyntax = null;
-			var methodDecl = node.FirstAncestorOrSelf<MethodDeclarationSyntax>();
-			if (methodDecl == null)
-				return false;
 
-			var methodParamNames = methodDecl.ParameterList.Parameters.Select(p => p.Identifier.ValueText).ToList();
 			var assessExpression = node.Expression as MemberAccessExpressionSyntax;
 			var contractTypeRef = assessExpression?.Expression as IdentifierNameSyntax;
 			var contractMethodRef = assessExpression?.Name.Identifier.ValueText ?? "";
@@ -40,12 +37,30 @@ namespace CodeContractsRemover
 			if (contractTypeRef?.Identifier.ValueText != "Contract" || ContractRemover.ContractMethods.Contains(contractMethodRef) == false)
 				return false;
 
+			var methodParamNames = new List<string>();
+			var methodDecl = node.FirstAncestorOrSelf<MethodDeclarationSyntax>();
+			var ctrDecl = node.FirstAncestorOrSelf<ConstructorDeclarationSyntax>();
+			var propDecl = node.FirstAncestorOrSelf<PropertyDeclarationSyntax>();
+			if (methodDecl != null)
+				methodParamNames.AddRange(methodDecl.ParameterList.Parameters.Select(p => p.Identifier.ValueText).ToList());
+			else if (ctrDecl != null)
+				methodParamNames.AddRange(ctrDecl.ParameterList.Parameters.Select(p => p.Identifier.ValueText).ToList());
+			else if (propDecl != null)
+				methodParamNames.Add("value");
+			else
+				return false;
+
 			if (this.mode == ContractReplacementMode.Convert && contractMethodRef == "Requires")
 			{
 				var nsPrefix = this.HasNamespace("System", node.SyntaxTree) ? "" : "System.";
 
 				var checkExpression = node.ArgumentList.Arguments[0].Expression;
-				var exceptionType = contractMethodTypeParams?.FirstOrDefault() ?? (isArgumentNullCheck(checkExpression, methodParamNames) ? SyntaxFactory.ParseTypeName(nsPrefix + "ArgumentNullException") : SyntaxFactory.ParseTypeName(nsPrefix + "ArgumentException"));
+				var exceptionType = contractMethodTypeParams?.FirstOrDefault() ??
+				(
+						IsArgumentNullCheck(checkExpression, methodParamNames) ? SyntaxFactory.ParseTypeName(nsPrefix + "ArgumentNullException") :
+						IsRangeCheck(checkExpression, methodParamNames) ? SyntaxFactory.ParseTypeName(nsPrefix + "ArgumentOutOfRangeException") :
+						SyntaxFactory.ParseTypeName(nsPrefix + "ArgumentException")
+				);
 				var paramRef = (
 					from n in checkExpression.DescendantNodes()
 					let idSyntax = n as IdentifierNameSyntax
@@ -55,7 +70,7 @@ namespace CodeContractsRemover
 				).FirstOrDefault() ?? "";
 
 				replacementSyntax = SyntaxFactory.IfStatement(
-					condition: SyntaxFactory.PrefixUnaryExpression(SyntaxKind.LogicalNotExpression, SyntaxFactory.ParenthesizedExpression(checkExpression)),
+					condition: InverseExpression(checkExpression),
 					statement: SyntaxFactory.Block(
 						SyntaxFactory.ThrowStatement(
 							SyntaxFactory.ObjectCreationExpression(
@@ -104,7 +119,7 @@ namespace CodeContractsRemover
 					select us).Any();
 		}
 
-		private bool isArgumentNullCheck(ExpressionSyntax syntaxNode, List<string> paramNames)
+		private bool IsArgumentNullCheck(ExpressionSyntax syntaxNode, List<string> paramNames)
 		{
 			var binaryExpression = syntaxNode as BinaryExpressionSyntax;
 			if (binaryExpression == null)
@@ -117,6 +132,59 @@ namespace CodeContractsRemover
 				return false;
 
 			return paramNames.Contains(paramExpression.Identifier.ValueText) && literalExpression.Token.Text == "null";
+		}
+		private bool IsRangeCheck(ExpressionSyntax syntaxNode, List<string> paramNames)
+		{
+			var binaryExpression = syntaxNode as BinaryExpressionSyntax;
+			if (binaryExpression == null)
+				return false;
+
+			var operatorKind = binaryExpression.OperatorToken.Kind();
+			var paramExpression = (binaryExpression.Left as IdentifierNameSyntax) ?? (binaryExpression.Right as IdentifierNameSyntax);
+			var literalExpression = (binaryExpression.Left as LiteralExpressionSyntax) ?? (binaryExpression.Right as LiteralExpressionSyntax);
+
+			if (paramExpression == null || literalExpression == null)
+				return false;
+
+			return paramNames.Contains(paramExpression.Identifier.ValueText) &&
+				   (operatorKind == SyntaxKind.GreaterThanEqualsToken ||
+					operatorKind == SyntaxKind.GreaterThanToken ||
+					operatorKind == SyntaxKind.LessThanEqualsToken ||
+					operatorKind == SyntaxKind.LessThanToken);
+		}
+		private ExpressionSyntax InverseExpression(ExpressionSyntax checkExpression)
+		{
+			if (checkExpression == null) throw new ArgumentNullException(nameof(checkExpression));
+
+			var binaryExpression = checkExpression as BinaryExpressionSyntax;
+			if (binaryExpression == null)
+				return InverseExpressionWithNot(checkExpression);
+
+			var operatorKind = binaryExpression.OperatorToken.Kind();
+			var isSimpleExpression = (binaryExpression.Left is IdentifierNameSyntax || binaryExpression.Right is IdentifierNameSyntax) &&
+									 (binaryExpression.Left is LiteralExpressionSyntax || binaryExpression.Right is LiteralExpressionSyntax);
+
+			if (!isSimpleExpression)
+				return InverseExpressionWithNot(checkExpression);
+
+			switch (operatorKind)
+			{
+				case SyntaxKind.EqualsEqualsToken: return binaryExpression.WithOperatorToken(SyntaxFactory.Token(SyntaxKind.ExclamationEqualsToken));
+				case SyntaxKind.ExclamationEqualsToken: return binaryExpression.WithOperatorToken(SyntaxFactory.Token(SyntaxKind.EqualsEqualsToken));
+				case SyntaxKind.GreaterThanToken: return binaryExpression.WithOperatorToken(SyntaxFactory.Token(SyntaxKind.LessThanEqualsToken));
+				case SyntaxKind.LessThanToken: return binaryExpression.WithOperatorToken(SyntaxFactory.Token(SyntaxKind.GreaterThanEqualsToken));
+				case SyntaxKind.GreaterThanEqualsToken: return binaryExpression.WithOperatorToken(SyntaxFactory.Token(SyntaxKind.LessThanToken));
+				case SyntaxKind.LessThanEqualsToken: return binaryExpression.WithOperatorToken(SyntaxFactory.Token(SyntaxKind.GreaterThanToken));
+
+				default: return InverseExpressionWithNot(checkExpression);
+			}
+		}
+
+		private ExpressionSyntax InverseExpressionWithNot(ExpressionSyntax checkExpression)
+		{
+			if (checkExpression == null) throw new ArgumentNullException(nameof(checkExpression));
+
+			return SyntaxFactory.PrefixUnaryExpression(SyntaxKind.LogicalNotExpression, SyntaxFactory.ParenthesizedExpression(checkExpression));
 		}
 	}
 }

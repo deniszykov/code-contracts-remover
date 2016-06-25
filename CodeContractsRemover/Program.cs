@@ -5,7 +5,7 @@ using System.Text;
 
 namespace CodeContractsRemover
 {
-	[Description("usage code_contracts_remover.exe <Convert|Remove> <directorPath> [searchPattern=*.cs] [encoding=utf-8]")]
+	[Description("usage code_contracts_remover.exe <Convert|Remove> <directoryPath> [searchPattern=*.cs] [encoding=utf-8]")]
 	public static class Program
 	{
 		public static int Main()
@@ -18,6 +18,7 @@ namespace CodeContractsRemover
 
 			foreach (var file in Directory.EnumerateFiles(path, searchPattern, SearchOption.AllDirectories))
 				ContractRemover.Process(file, ContractReplacementMode.Remove, Encoding.GetEncoding(encoding));
+
 			return 0;
 		}
 
