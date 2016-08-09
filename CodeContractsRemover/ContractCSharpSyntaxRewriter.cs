@@ -38,14 +38,12 @@ namespace CodeContractsRemover
 				return false;
 
 			var methodParamNames = new List<string>();
-			var methodDecl = node.FirstAncestorOrSelf<MethodDeclarationSyntax>();
-			var ctrDecl = node.FirstAncestorOrSelf<ConstructorDeclarationSyntax>();
+			var methodDecl = node.FirstAncestorOrSelf<BaseMethodDeclarationSyntax>();
 			var propDecl = node.FirstAncestorOrSelf<PropertyDeclarationSyntax>();
+			var eventDecl = node.FirstAncestorOrSelf<EventDeclarationSyntax>();
 			if (methodDecl != null)
 				methodParamNames.AddRange(methodDecl.ParameterList.Parameters.Select(p => p.Identifier.ValueText).ToList());
-			else if (ctrDecl != null)
-				methodParamNames.AddRange(ctrDecl.ParameterList.Parameters.Select(p => p.Identifier.ValueText).ToList());
-			else if (propDecl != null)
+			else if (propDecl != null || eventDecl != null)
 				methodParamNames.Add("value");
 			else
 				return false;
