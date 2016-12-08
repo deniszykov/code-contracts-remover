@@ -1,6 +1,6 @@
 Introduction
 ============
-Tool for removing .NET Code Contracts source code
+Tool for removing .NET Code Contracts from source code.
 
 Installation
 ============
@@ -10,6 +10,8 @@ Install-Package CodeContractsRemover
 
 Usage
 ============
+Tool is located at "PROJECT_DIR/packages/CodeContractsRemover.VERSION/tools/".
+
 ```bash
 code_contracts_remover.exe <Convert|Remove> <directoryPath> [searchPattern=*.cs] [encoding=utf-8]
 ```
@@ -18,10 +20,24 @@ Example
 code_contracts_remover.exe Convert ./myproject
 ```
 
-#### Convert
-- Converts all Contract.Requires to "if throw ArgumentException" pattern.
-- Converts all Contract.Assert to Debug.Assert
-- Removes any other Contract invocations.
+To run using [mono](http://www.mono-project.com/download/#download-mac) on Mac OS X
+```bash
+/Library/Frameworks/Mono.framework/Commands/mono code_contracts_remover.exe Convert ./myproject
+```
 
-#### Remove
-- Removes any Contract invocations.
+To run using [mono](http://www.mono-project.com/download/#download-lin) on Linux
+```bash
+/usr/bin/mono code_contracts_remover.exe Convert ./myproject
+```
+
+## Modes
+
+#### Mode - Convert
+- Converts all [Contract.Requires](https://msdn.microsoft.com/en-us/library/system.diagnostics.contracts.contract.requires(v=vs.110).aspx) to "if(!x) throw new ArgumentException()" pattern.
+- Converts all [Contract.Assert](https://msdn.microsoft.com/en-us/library/system.diagnostics.contracts.contract.assert(v=vs.110).aspx) to [Debug.Assert](https://msdn.microsoft.com/en-us/library/system.diagnostics.debug.assert(v=vs.110).aspx)
+- Removes any other [Contract](https://msdn.microsoft.com/en-us/library/system.diagnostics.contracts.contract(v=vs.110).aspx) invocations.
+- Attributes and Invariant methods are preserved
+
+#### Mode - Remove
+- Removes any [Contract](https://msdn.microsoft.com/en-us/library/system.diagnostics.contracts.contract(v=vs.110).aspx) invocations.
+- Attributes and Invariant methods are preserved
