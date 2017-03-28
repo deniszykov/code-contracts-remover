@@ -14,6 +14,14 @@ namespace CodeContractsRemover
 			"Assert","Assume","EndContractBlock","Ensures","EnsuresOnThrow","Exists","ForAll",
 			"Invariant","OldValue","Requires","Result","ValueAtReturn"
 		};
+		public const string ContractClassForAttributeName = "ContractClassFor";
+		public static readonly HashSet<string> ContractAttributes = new HashSet<string>
+		{
+			"ContractClass","ContractAbbreviator","ContractArgumentValidator","ContractInvariantMethod","ContractOption","ContractPublicPropertyName","ContractReferenceAssembly",
+			"ContractRuntimeIgnored","ContractVerification","Pure",
+			"ContractClassAttribute","ContractAbbreviatorAttribute","ContractArgumentValidatorAttribute","ContractInvariantMethodAttribute","ContractOptionAttribute",
+			"ContractPublicPropertyNameAttribute","ContractReferenceAssemblyAttribute", "ContractRuntimeIgnoredAttribute","ContractVerificationAttribute", "PureAttribute",
+		};
 
 		public static void Process(string filePath, ContractReplacementMode mode, Encoding encoding)
 		{

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Management.Instrumentation;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -24,7 +25,6 @@ namespace CodeContractsRemover
 
 			return base.VisitExpressionStatement(node);
 		}
-
 		private bool VisitInvocationExpression(InvocationExpressionSyntax node, out StatementSyntax replacementSyntax)
 		{
 			replacementSyntax = null;
@@ -40,18 +40,24 @@ namespace CodeContractsRemover
 			var methodParamNames = new List<string>();
 			var methodDecl = node.FirstAncestorOrSelf<BaseMethodDeclarationSyntax>();
 			var propDecl = node.FirstAncestorOrSelf<PropertyDeclarationSyntax>();
+			var indexDecl = node.FirstAncestorOrSelf<IndexerDeclarationSyntax>();
 			var eventDecl = node.FirstAncestorOrSelf<EventDeclarationSyntax>();
 			if (methodDecl != null)
 				methodParamNames.AddRange(methodDecl.ParameterList.Parameters.Select(p => p.Identifier.ValueText).ToList());
 			else if (propDecl != null || eventDecl != null)
 				methodParamNames.Add("value");
+			else if (indexDecl != null)
+			{
+				methodParamNames.AddRange(indexDecl.ParameterList.Parameters.Select(p => p.Identifier.ValueText).ToList());
+				methodParamNames.Add("value");
+			}
 			else
 				return false;
+
 
 			if (this.mode == ContractReplacementMode.Convert && contractMethodRef == "Requires")
 			{
 				var nsPrefix = this.HasNamespace("System", node.SyntaxTree) ? "" : "System.";
-
 				var checkExpression = node.ArgumentList.Arguments[0].Expression;
 				var exceptionType = contractMethodTypeParams?.FirstOrDefault() ??
 				(
@@ -66,6 +72,10 @@ namespace CodeContractsRemover
 					where id != null && methodParamNames.Contains(id)
 					select id
 				).FirstOrDefault() ?? "";
+
+
+				if (ContractCSharpMethodCallFinder.Look(checkExpression))
+					return true; // replace with null
 
 				replacementSyntax = SyntaxFactory.IfStatement(
 					condition: InverseExpression(checkExpression),
@@ -83,7 +93,7 @@ namespace CodeContractsRemover
 							)
 						)
 					)
-				).NormalizeWhitespace(eol: string.Empty, indentation: " ").WithTriviaFrom(node.Parent);
+				).NormalizeWhitespace(eol: " ", indentation: " ").WithTriviaFrom(node.Parent);
 			}
 			else if (this.mode == ContractReplacementMode.Convert && (contractMethodRef == "Assert" || contractMethodRef == "Assume"))
 			{
@@ -106,6 +116,29 @@ namespace CodeContractsRemover
 
 			return true;
 		}
+		public override SyntaxNode VisitClassDeclaration(ClassDeclarationSyntax node)
+		{
+			// remove [ContractClassForAttribute]
+			if (HasAttribute(node.AttributeLists, ContractRemover.ContractClassForAttributeName))
+				return null;
+
+			return base.VisitClassDeclaration(node);
+		}
+		public override SyntaxNode VisitAttribute(AttributeSyntax node)
+		{
+			if (ContractRemover.ContractAttributes.Contains(node.Name.ToString()))
+				return null;
+
+			return base.VisitAttribute(node);
+		}
+		public override SyntaxNode VisitAttributeList(AttributeListSyntax node)
+		{
+			node = (AttributeListSyntax)base.VisitAttributeList(node);
+
+			if (node.Attributes.Count == 0)
+				return null;
+			return node;
+		}
 
 		private bool HasNamespace(string namespaceName, SyntaxTree tree)
 		{
@@ -115,6 +148,10 @@ namespace CodeContractsRemover
 					from us in nsblock.Usings
 					where us.Name.GetText().ToString() == namespaceName
 					select us).Any();
+		}
+		private bool HasAttribute(SyntaxList<AttributeListSyntax> attributes, string attributeName)
+		{
+			return attributes.Any(al => al.Attributes.Select(a => a.Name.ToString()).Any(n => n == attributeName || n == attributeName + "Attribute"));
 		}
 
 		private bool IsArgumentNullCheck(ExpressionSyntax syntaxNode, List<string> paramNames)
@@ -177,7 +214,6 @@ namespace CodeContractsRemover
 				default: return InverseExpressionWithNot(checkExpression);
 			}
 		}
-
 		private ExpressionSyntax InverseExpressionWithNot(ExpressionSyntax checkExpression)
 		{
 			if (checkExpression == null) throw new ArgumentNullException(nameof(checkExpression));

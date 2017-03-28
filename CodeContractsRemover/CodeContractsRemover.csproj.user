@@ -7,4 +7,10 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|AnyCPU'">
     <StartArguments>Convert "E:\dev\maddogsserver\server"</StartArguments>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x86'">
+    <StartArguments>Convert "E:\dev\maddogsserver\server"</StartArguments>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
+    <StartArguments>Convert "E:\dev\pet\pluto"</StartArguments>
+  </PropertyGroup>
 </Project>
