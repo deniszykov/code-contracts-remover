@@ -1,6 +1,7 @@
 Introduction
 ============
-Tool for removing .NET Code Contracts from source code.
+Tool for removing .NET Code Contracts from source code. 
+Currently only C# is supported. I will gladly accept PR with VB support.
 
 Installation
 ============
@@ -36,8 +37,10 @@ To run using [mono](http://www.mono-project.com/download/#download-lin) on Linux
 - Converts all [Contract.Requires](https://msdn.microsoft.com/en-us/library/system.diagnostics.contracts.contract.requires(v=vs.110).aspx) to "if(!x) throw new ArgumentException()" pattern.
 - Converts all [Contract.Assert](https://msdn.microsoft.com/en-us/library/system.diagnostics.contracts.contract.assert(v=vs.110).aspx) to [Debug.Assert](https://msdn.microsoft.com/en-us/library/system.diagnostics.debug.assert(v=vs.110).aspx)
 - Removes any other [Contract](https://msdn.microsoft.com/en-us/library/system.diagnostics.contracts.contract(v=vs.110).aspx) invocations.
-- Attributes and Invariant methods are preserved
+- Invariant methods are preserved
+- Attributes and Contract classes are removed
 
 #### Mode - Remove
 - Removes any [Contract](https://msdn.microsoft.com/en-us/library/system.diagnostics.contracts.contract(v=vs.110).aspx) invocations.
-- Attributes and Invariant methods are preserved
+- Invariant methods are preserved
+- Attributes and Contract classes are removed
