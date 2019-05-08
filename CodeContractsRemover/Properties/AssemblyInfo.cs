@@ -1,4 +1,4 @@
-﻿using System.Reflection;
+using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
@@ -10,7 +10,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Denis Zykov")]
 [assembly: AssemblyProduct("Code Contracts Removing Tool")]
-[assembly: AssemblyCopyright("Copyright ©  2016 Denis Zykov")]
+[assembly: AssemblyCopyright("Copyright ©  2019 Denis Zykov")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
@@ -32,6 +32,6 @@ using System.Runtime.InteropServices;
 // You can specify all the values or you can default the Build and Revision Numbers
 // by using the '*' as shown below:
 // [assembly: AssemblyVersion("1.0.*")]
-[assembly: AssemblyVersion("1.0.5.0")]
-[assembly: AssemblyFileVersion("1.0.5.0")]
-[assembly: AssemblyInformationalVersionAttribute("1.0.5")]
+[assembly: AssemblyVersion("1.0.6.0")]
+[assembly: AssemblyFileVersion("1.0.6.0")]
+[assembly: AssemblyInformationalVersionAttribute("1.0.6")]

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Management.Instrumentation;
@@ -77,6 +77,17 @@ namespace CodeContractsRemover
 				if (ContractCSharpMethodCallFinder.Look(checkExpression))
 					return true; // replace with null
 
+				var replacementParams = new[] {
+					SyntaxFactory.Literal(paramRef),
+					SyntaxFactory.Literal(checkExpression.ToString())
+				};
+
+				if (exceptionType.ToString().EndsWith(".ArgumentException", StringComparison.Ordinal) ||
+					exceptionType.ToString().Equals("ArgumentException", StringComparison.Ordinal))
+				{
+					Array.Reverse(replacementParams); // ArgumentException has reverse params order
+				}
+
 				replacementSyntax = SyntaxFactory.IfStatement(
 					condition: InverseExpression(checkExpression),
 					statement: SyntaxFactory.Block(
@@ -85,8 +96,8 @@ namespace CodeContractsRemover
 								type: exceptionType,
 								argumentList: SyntaxFactory.ArgumentList(
 									new SeparatedSyntaxList<ArgumentSyntax>()
-										.Add(SyntaxFactory.Argument(SyntaxFactory.LiteralExpression(SyntaxKind.StringLiteralExpression, SyntaxFactory.Literal(paramRef))))
-										.Add(SyntaxFactory.Argument(SyntaxFactory.LiteralExpression(SyntaxKind.StringLiteralExpression, SyntaxFactory.Literal(checkExpression.ToString()))))
+										.Add(SyntaxFactory.Argument(SyntaxFactory.LiteralExpression(SyntaxKind.StringLiteralExpression, replacementParams[0])))
+										.Add(SyntaxFactory.Argument(SyntaxFactory.LiteralExpression(SyntaxKind.StringLiteralExpression, replacementParams[1])))
 
 								),
 								initializer: null

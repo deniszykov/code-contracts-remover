@@ -9,8 +9,9 @@
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>$description$</description>
     <releaseNotes></releaseNotes>
-    <copyright>Copyright © 2016 Denis Zykov</copyright>
+    <copyright>Copyright © 2019 Denis Zykov</copyright>
     <tags>codecontracts contracts tool</tags>
+	<projectUrl>https://github.com/deniszykov/code-contracts-remover</projectUrl>
+	<licenseUrl>https://raw.githubusercontent.com/deniszykov/code-contracts-remover/master/LICENSE</licenseUrl>
   </metadata>
-   
 </package>
