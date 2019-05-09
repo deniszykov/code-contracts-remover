@@ -5,6 +5,7 @@ using System.Management.Instrumentation;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 
 namespace CodeContractsRemover
 {
@@ -17,6 +18,16 @@ namespace CodeContractsRemover
 			this.mode = mode;
 		}
 
+		public override SyntaxNode VisitUsingDirective(UsingDirectiveSyntax node)
+		{
+			if (node.Name.GetText().ToString() == "System.Diagnostics.Contracts")
+			{
+				return null;
+			}
+
+			return base.VisitUsingDirective(node);
+		}
+
 		public override SyntaxNode VisitExpressionStatement(ExpressionStatementSyntax node)
 		{
 			var replacementSyntax = default(StatementSyntax);
@@ -25,6 +36,7 @@ namespace CodeContractsRemover
 
 			return base.VisitExpressionStatement(node);
 		}
+
 		private bool VisitInvocationExpression(InvocationExpressionSyntax node, out StatementSyntax replacementSyntax)
 		{
 			replacementSyntax = null;
@@ -55,31 +67,31 @@ namespace CodeContractsRemover
 				return false;
 
 
-			if (this.mode == ContractReplacementMode.Convert && contractMethodRef == "Requires")
+			if (this.mode == ContractReplacementMode.Convert && (contractMethodRef == "Assert" || contractMethodRef == "Assume" || contractMethodRef == "Requires"))
 			{
 				var nsPrefix = this.HasNamespace("System", node.SyntaxTree) ? "" : "System.";
 				var checkExpression = node.ArgumentList.Arguments[0].Expression;
+				var errorMessageExpression = node.ArgumentList.Arguments.Count > 1 ? node.ArgumentList.Arguments[1].Expression : null;
 				var exceptionType = contractMethodTypeParams?.FirstOrDefault() ??
 				(
-						IsArgumentNullCheck(checkExpression, methodParamNames) ? SyntaxFactory.ParseTypeName(nsPrefix + "ArgumentNullException") :
-						IsRangeCheck(checkExpression, methodParamNames) ? SyntaxFactory.ParseTypeName(nsPrefix + "ArgumentOutOfRangeException") :
-						SyntaxFactory.ParseTypeName(nsPrefix + "ArgumentException")
+					IsArgumentNullCheck(checkExpression, methodParamNames) ? ParseTypeName(nsPrefix + "ArgumentNullException") :
+					IsRangeCheck(checkExpression, methodParamNames) ? ParseTypeName(nsPrefix + "ArgumentOutOfRangeException") :
+					ParseTypeName(nsPrefix + "ArgumentException")
 				);
-				var paramRef = (
-					from n in checkExpression.DescendantNodes()
-					let idSyntax = n as IdentifierNameSyntax
-					let id = idSyntax?.Identifier.ValueText
-					where id != null && methodParamNames.Contains(id)
-					select id
-				).FirstOrDefault() ?? "";
-
+				var paramRef = checkExpression.DescendantNodes().OfType<IdentifierNameSyntax>()
+					.Where(ids => methodParamNames.Contains(ids.Identifier.ValueText))
+					.FirstOrDefault();
+				var paramNameRef = paramRef != null
+					? (ExpressionSyntax)InvocationExpression(IdentifierName("nameof"))
+						.WithArgumentList(ArgumentList(SingletonSeparatedList(Argument(paramRef))))
+					: LiteralExpression(SyntaxKind.StringLiteralExpression, Literal("value"));
 
 				if (ContractCSharpMethodCallFinder.Look(checkExpression))
 					return true; // replace with null
 
-				var replacementParams = new[] {
-					SyntaxFactory.Literal(paramRef),
-					SyntaxFactory.Literal(checkExpression.ToString())
+				var replacementParams = new ExpressionSyntax[] {
+					paramNameRef,
+					errorMessageExpression ?? LiteralExpression(SyntaxKind.StringLiteralExpression, Literal("Contract assertion not met: " + checkExpression.ToString()))
 				};
 
 				if (exceptionType.ToString().EndsWith(".ArgumentException", StringComparison.Ordinal) ||
@@ -88,45 +100,59 @@ namespace CodeContractsRemover
 					Array.Reverse(replacementParams); // ArgumentException has reverse params order
 				}
 
-				replacementSyntax = SyntaxFactory.IfStatement(
+				// this includes comments
+				var firstbaseWhitespace = node.Parent.GetLeadingTrivia();
+				// this is exclusively indention
+				var baseWhitespace = TriviaList(firstbaseWhitespace.Reverse().TakeWhile(stt => stt.IsKind(SyntaxKind.WhitespaceTrivia)).Reverse());
+				var indentedWhitespace = baseWhitespace.Add(Whitespace("    "));
+				var endOfLineTrivia = node.Parent.GetTrailingTrivia();
+				var spaceList = TriviaList(Space);
+				replacementSyntax = IfStatement(
 					condition: InverseExpression(checkExpression),
-					statement: SyntaxFactory.Block(
-						SyntaxFactory.ThrowStatement(
-							SyntaxFactory.ObjectCreationExpression(
+					statement: Block(
+						ThrowStatement(
+							ObjectCreationExpression(
 								type: exceptionType,
-								argumentList: SyntaxFactory.ArgumentList(
+								argumentList: ArgumentList(
 									new SeparatedSyntaxList<ArgumentSyntax>()
-										.Add(SyntaxFactory.Argument(SyntaxFactory.LiteralExpression(SyntaxKind.StringLiteralExpression, replacementParams[0])))
-										.Add(SyntaxFactory.Argument(SyntaxFactory.LiteralExpression(SyntaxKind.StringLiteralExpression, replacementParams[1])))
+										.Add(Argument(replacementParams[0]))
+										.Add(Argument(replacementParams[1]))
 
 								),
 								initializer: null
-							)
+							).NormalizeWhitespace()
 						)
+							.WithThrowKeyword(Token(indentedWhitespace, SyntaxKind.ThrowKeyword, spaceList))
+							.WithSemicolonToken(Token(TriviaList(), SyntaxKind.SemicolonToken, endOfLineTrivia))
 					)
-				).NormalizeWhitespace(eol: " ", indentation: " ").WithTriviaFrom(node.Parent);
+						.WithOpenBraceToken(Token(baseWhitespace, SyntaxKind.OpenBraceToken, endOfLineTrivia))
+						.WithCloseBraceToken(Token(baseWhitespace, SyntaxKind.CloseBraceToken, endOfLineTrivia))
+				)
+					.WithIfKeyword(Token(firstbaseWhitespace, SyntaxKind.IfKeyword, spaceList))
+					.WithCloseParenToken(Token(TriviaList(), SyntaxKind.CloseParenToken, endOfLineTrivia));
 			}
-			else if (this.mode == ContractReplacementMode.Convert && (contractMethodRef == "Assert" || contractMethodRef == "Assume"))
-			{
-				var nsPrefix = this.HasNamespace("System.Diagnostics", node.SyntaxTree) ? "" : "System.Diagnostics.";
+			//else if (this.mode == ContractReplacementMode.Convert && (contractMethodRef == "Assert" || contractMethodRef == "Assume"))
+			//{
+			//	var nsPrefix = this.HasNamespace("System.Diagnostics", node.SyntaxTree) ? "" : "System.Diagnostics.";
 
-				var checkExpression = node.ArgumentList.Arguments[0].Expression;
-				var messageExpression = node.ArgumentList.Arguments.ElementAtOrDefault(1)?.Expression;
+			//	var checkExpression = node.ArgumentList.Arguments[0].Expression;
+			//	var messageExpression = node.ArgumentList.Arguments.ElementAtOrDefault(1)?.Expression;
 
-				replacementSyntax = SyntaxFactory.ExpressionStatement(
-					SyntaxFactory.InvocationExpression(
-						expression: SyntaxFactory.MemberAccessExpression(SyntaxKind.SimpleMemberAccessExpression, SyntaxFactory.ParseTypeName(nsPrefix + "Debug"), SyntaxFactory.IdentifierName("Assert")),
-						argumentList: SyntaxFactory.ArgumentList(
-							new SeparatedSyntaxList<ArgumentSyntax>()
-								.Add(SyntaxFactory.Argument(checkExpression))
-								.Add(SyntaxFactory.Argument(messageExpression ?? SyntaxFactory.LiteralExpression(SyntaxKind.StringLiteralExpression, SyntaxFactory.Literal(checkExpression.ToString()))))
-						)
-					)
-				).NormalizeWhitespace(eol: string.Empty, indentation: " ").WithTriviaFrom(node.Parent);
-			}
+			//	replacementSyntax = SyntaxFactory.ExpressionStatement(
+			//		SyntaxFactory.InvocationExpression(
+			//			expression: SyntaxFactory.MemberAccessExpression(SyntaxKind.SimpleMemberAccessExpression, SyntaxFactory.ParseTypeName(nsPrefix + "Debug"), SyntaxFactory.IdentifierName("Assert")),
+			//			argumentList: SyntaxFactory.ArgumentList(
+			//				new SeparatedSyntaxList<ArgumentSyntax>()
+			//					.Add(SyntaxFactory.Argument(checkExpression))
+			//					.Add(SyntaxFactory.Argument(messageExpression ?? SyntaxFactory.LiteralExpression(SyntaxKind.StringLiteralExpression, SyntaxFactory.Literal(checkExpression.ToString()))))
+			//			)
+			//		)
+			//	).NormalizeWhitespace(eol: string.Empty, indentation: " ").WithTriviaFrom(node.Parent);
+			//}
 
 			return true;
 		}
+
 		public override SyntaxNode VisitClassDeclaration(ClassDeclarationSyntax node)
 		{
 			// remove [ContractClassForAttribute]
@@ -135,6 +161,7 @@ namespace CodeContractsRemover
 
 			return base.VisitClassDeclaration(node);
 		}
+
 		public override SyntaxNode VisitAttribute(AttributeSyntax node)
 		{
 			if (ContractRemover.ContractAttributes.Contains(node.Name.ToString()))
@@ -142,6 +169,7 @@ namespace CodeContractsRemover
 
 			return base.VisitAttribute(node);
 		}
+
 		public override SyntaxNode VisitAttributeList(AttributeListSyntax node)
 		{
 			node = (AttributeListSyntax)base.VisitAttributeList(node);
@@ -153,6 +181,11 @@ namespace CodeContractsRemover
 
 		private bool HasNamespace(string namespaceName, SyntaxTree tree)
 		{
+			if (tree.GetRoot().ChildNodes().OfType<UsingDirectiveSyntax>().Any(uds => uds.Name.GetText().ToString() == namespaceName))
+			{
+				return true;
+			}
+
 			return (from n in tree.GetRoot().ChildNodes()
 					let nsblock = n as NamespaceDeclarationSyntax
 					where nsblock != null
@@ -160,6 +193,7 @@ namespace CodeContractsRemover
 					where us.Name.GetText().ToString() == namespaceName
 					select us).Any();
 		}
+
 		private bool HasAttribute(SyntaxList<AttributeListSyntax> attributes, string attributeName)
 		{
 			return attributes.Any(al => al.Attributes.Select(a => a.Name.ToString()).Any(n => n == attributeName || n == attributeName + "Attribute"));
@@ -179,6 +213,7 @@ namespace CodeContractsRemover
 
 			return paramNames.Contains(paramExpression.Identifier.ValueText) && literalExpression.Token.Text == "null";
 		}
+
 		private bool IsRangeCheck(ExpressionSyntax syntaxNode, List<string> paramNames)
 		{
 			var binaryExpression = syntaxNode as BinaryExpressionSyntax;
@@ -198,9 +233,17 @@ namespace CodeContractsRemover
 					operatorKind == SyntaxKind.LessThanEqualsToken ||
 					operatorKind == SyntaxKind.LessThanToken);
 		}
+
 		private ExpressionSyntax InverseExpression(ExpressionSyntax checkExpression)
 		{
 			if (checkExpression == null) throw new ArgumentNullException(nameof(checkExpression));
+
+			var logicalNotExpression = checkExpression as PrefixUnaryExpressionSyntax;
+			if (logicalNotExpression != null
+				&& logicalNotExpression.OperatorToken.Kind() == SyntaxKind.ExclamationToken)
+			{
+				return logicalNotExpression.Operand;
+			}
 
 			var binaryExpression = checkExpression as BinaryExpressionSyntax;
 			if (binaryExpression == null)
@@ -215,21 +258,22 @@ namespace CodeContractsRemover
 
 			switch (operatorKind)
 			{
-				case SyntaxKind.EqualsEqualsToken: return binaryExpression.WithOperatorToken(SyntaxFactory.Token(SyntaxKind.ExclamationEqualsToken));
-				case SyntaxKind.ExclamationEqualsToken: return binaryExpression.WithOperatorToken(SyntaxFactory.Token(SyntaxKind.EqualsEqualsToken));
-				case SyntaxKind.GreaterThanToken: return binaryExpression.WithOperatorToken(SyntaxFactory.Token(SyntaxKind.LessThanEqualsToken));
-				case SyntaxKind.LessThanToken: return binaryExpression.WithOperatorToken(SyntaxFactory.Token(SyntaxKind.GreaterThanEqualsToken));
-				case SyntaxKind.GreaterThanEqualsToken: return binaryExpression.WithOperatorToken(SyntaxFactory.Token(SyntaxKind.LessThanToken));
-				case SyntaxKind.LessThanEqualsToken: return binaryExpression.WithOperatorToken(SyntaxFactory.Token(SyntaxKind.GreaterThanToken));
+				case SyntaxKind.EqualsEqualsToken: return binaryExpression.WithOperatorToken(Token(SyntaxKind.ExclamationEqualsToken).WithTriviaFrom(binaryExpression.OperatorToken));
+				case SyntaxKind.ExclamationEqualsToken: return binaryExpression.WithOperatorToken(Token(SyntaxKind.EqualsEqualsToken).WithTriviaFrom(binaryExpression.OperatorToken));
+				//case SyntaxKind.GreaterThanToken: return binaryExpression.WithOperatorToken(Token(SyntaxKind.LessThanEqualsToken));
+				//case SyntaxKind.LessThanToken: return binaryExpression.WithOperatorToken(Token(SyntaxKind.GreaterThanEqualsToken));
+				//case SyntaxKind.GreaterThanEqualsToken: return binaryExpression.WithOperatorToken(Token(SyntaxKind.LessThanToken));
+				//case SyntaxKind.LessThanEqualsToken: return binaryExpression.WithOperatorToken(Token(SyntaxKind.GreaterThanToken));
 
 				default: return InverseExpressionWithNot(checkExpression);
 			}
 		}
+
 		private ExpressionSyntax InverseExpressionWithNot(ExpressionSyntax checkExpression)
 		{
 			if (checkExpression == null) throw new ArgumentNullException(nameof(checkExpression));
 
-			return SyntaxFactory.PrefixUnaryExpression(SyntaxKind.LogicalNotExpression, SyntaxFactory.ParenthesizedExpression(checkExpression));
+			return PrefixUnaryExpression(SyntaxKind.LogicalNotExpression, ParenthesizedExpression(checkExpression));
 		}
 	}
 }
