@@ -1,7 +1,7 @@
-using Microsoft.Build.Evaluation;
 using System;
 using System.IO;
 using System.Linq;
+using Microsoft.Build.Construction;
 
 namespace CodeContractsRemover
 {
@@ -15,8 +15,8 @@ namespace CodeContractsRemover
 			if (filePath.EndsWith(".csproj", StringComparison.OrdinalIgnoreCase) ||
 				filePath.EndsWith(".vbproj", StringComparison.OrdinalIgnoreCase))
 			{
-				var project = new Project(filePath);
-				foreach (var pg in project.Xml.PropertyGroups)
+				var project = ProjectRootElement.Open(filePath);
+				foreach (var pg in project.PropertyGroups)
 				{
 					var propsToRemove = pg.Properties.Where(p => p.Name.StartsWith("CodeContracts", StringComparison.OrdinalIgnoreCase)).ToArray();
 					foreach (var prop in propsToRemove)
@@ -27,7 +27,7 @@ namespace CodeContractsRemover
 				}
 				if (changed)
 				{
-					project.Xml.Save();
+					project.Save();
 				}
 			}
 			else

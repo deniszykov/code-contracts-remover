@@ -23,3 +23,4 @@ bin/
 obj/
 packages/
 CodeContractsRemover/build-nuget-package.bat
+/CodeContractsRemover/Properties/launchSettings.json

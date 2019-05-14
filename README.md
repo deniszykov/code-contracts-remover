@@ -14,7 +14,7 @@ Usage
 Tool is located at "PROJECT_DIR/packages/CodeContractsRemover.VERSION/tools/".
 
 ```bash
-code_contracts_remover.exe <Convert|Remove> <directoryPath> [--searchPattern=*.cs] [--encoding=utf-8]
+CodeContractsRemover.exe <Convert|Remove> <directoryPath> [--searchPattern *.cs *.csproj] [--encoding utf-8] [--ignorePattern .svn/ ]
 ```
 Example
 ```bash
