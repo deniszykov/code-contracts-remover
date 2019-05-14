@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
@@ -52,7 +52,7 @@ namespace CodeContractsRemover
 			}
 			else
 			{
-				throw new NotSupportedException($"Unknown file extention {Path.GetExtension(filePath)}. Only .cs and .vb is supported.");
+				throw new NotSupportedException($"Unknown code file extension {Path.GetExtension(filePath)}. Only .cs and .vb are supported.");
 			}
 
 			if (changed)
