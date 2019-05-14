@@ -3,6 +3,8 @@ Introduction
 Tool for removing .NET Code Contracts from source code. 
 Currently only C# is supported. I will gladly accept PR with VB support.
 
+.NET 4.7.1 is required to run this application.
+
 Installation
 ============
 ```
@@ -18,7 +20,7 @@ CodeContractsRemover.exe <Convert|Remove> <directoryPath> [--searchPattern *.cs 
 ```
 Example
 ```bash
-code_contracts_remover.exe Convert ./myproject
+CodeContractsRemover.exe Convert ./myproject
 ```
 
 To run using [mono](http://www.mono-project.com/download/#download-mac) on Mac OS X
