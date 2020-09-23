@@ -14,7 +14,7 @@ namespace CodeContractsRemover
 			return CommandLine.Run(typeof(Program), CommandLine.Arguments, "Help");
 		}
 
-		public static int Remove(string path, string[] searchPattern = null, string encoding = "utf-8", string[] ignorePattern = null)
+		public static int Remove(string path = ".", string[] searchPattern = null, string encoding = "utf-8", string[] ignorePattern = null)
 		{
 			if (searchPattern == null) searchPattern = new[] { "*.cs", "*.vb" };
 
@@ -39,7 +39,7 @@ namespace CodeContractsRemover
 			return 0;
 		}
 
-		public static int Convert(string path, string[] searchPattern = null, string encoding = "utf-8", string[] ignorePattern = null)
+		public static int Convert(string path = ".", string[] searchPattern = null, string encoding = "utf-8", string[] ignorePattern = null)
 		{
 			if (searchPattern == null) searchPattern = new[] { "*.cs", "*.vb" };
 
