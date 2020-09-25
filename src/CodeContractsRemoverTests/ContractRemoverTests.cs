@@ -10,7 +10,7 @@ using NUnit.Framework;
 namespace CodeContractsRemoverTests
 {
 	[UseReporter(typeof(DiffReporter))]
-	public class ContractCSharpSyntaxRewriterTests
+	public class ContractRemoverTests
     {
 	    private static string InitialFileName
 	    {
@@ -22,16 +22,16 @@ namespace CodeContractsRemoverTests
 	    }
 
 	    [Test]
-        public void Convert_IntegrationTest()
+        public void Process_ConvertMode_ResultIsCorrect()
         {
 			//Arrange
-			File.Copy(InitialFileName, $"{nameof(Convert_IntegrationTest)}.cs");
+			File.Copy(InitialFileName, $"{nameof(Process_ConvertMode_ResultIsCorrect)}.cs");
 
 			//Act
-			ContractRemover.Process($"{nameof(Convert_IntegrationTest)}.cs", ContractReplacementMode.Convert, Encoding.UTF8);
+			ContractRemover.Process($"{nameof(Process_ConvertMode_ResultIsCorrect)}.cs", ContractReplacementMode.Convert, Encoding.UTF8);
 
 			//Assert
-			Approvals.VerifyFile($"{nameof(Convert_IntegrationTest)}.cs");
+			Approvals.VerifyFile($"{nameof(Process_ConvertMode_ResultIsCorrect)}.cs");
         }
     }
 }

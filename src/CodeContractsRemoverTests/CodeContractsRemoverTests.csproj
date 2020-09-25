@@ -20,10 +20,11 @@
   <Import Project="$(VSToolsPath)\TeamTest\Microsoft.TestTools.targets" Condition="Exists('$(VSToolsPath)\TeamTest\Microsoft.TestTools.targets')" />
   <ItemGroup>
     <Compile Remove="ContractCSharpSyntaxRewriterTests.Convert_IntegrationTest.approved.cs" />
+    <Compile Remove="ContractRemoverTests.Process_ConvertMode_ResultIsCorrect.approved.cs" />
     <Compile Remove="TestCases\TestSubject.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="ContractCSharpSyntaxRewriterTests.Convert_IntegrationTest.approved.cs" />
+    <None Include="ContractRemoverTests.Process_ConvertMode_ResultIsCorrect.approved.cs" />
     <None Include="TestCases\TestSubject.cs">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
@@ -48,5 +49,10 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\CodeContractsRemover\CodeContractsRemover.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Update="C:\Users\ishatalkin\.nuget\packages\mstest.testadapter\1.4.0\build\net45\..\_common\Microsoft.VisualStudio.TestPlatform.MSTestAdapter.PlatformServices.dll">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
 </Project>
