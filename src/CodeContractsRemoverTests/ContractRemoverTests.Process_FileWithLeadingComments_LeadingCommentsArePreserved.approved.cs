@@ -26,7 +26,7 @@ namespace Test
 		[global::System.Diagnostics.CodeAnalysis.SuppressMessageAttribute("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
 		internal void Ccc()
 		{
-			if (!(1 == 1)) throw new System.ArgumentException("Contract assertion not met: 1 == 1", "value");
+			if (!(1 == 1)) throw new System.InvalidOperationException($"Contract assertion not met: 1 == 1");
 		}
 
 		
