@@ -10,13 +10,17 @@ Installation
 ```
 Install-Package CodeContractsRemover
 ```
+or
+```
+Download and un-zip from https://www.nuget.org/api/v2/package/CodeContractsRemover 
+```
 
 Usage
 ============
 Tool is located at "PROJECT_DIR/packages/CodeContractsRemover.VERSION/tools/".
 
 ```bash
-CodeContractsRemover.exe <Convert|Remove> <directoryPath> [--searchPattern *.cs *.csproj] [--encoding utf-8] [--ignorePattern .svn/ ]
+CodeContractsRemover.exe <Convert|Remove|Stats> <directoryPath> [--searchPattern *.cs *.csproj] [--encoding utf-8] [--ignorePattern .svn/ ]
 ```
 Example
 ```bash
