@@ -16,7 +16,7 @@ namespace CodeContractsRemover.CS
 		{
 			var modes = new[] {ContractReplacementMode.Convert, ContractReplacementMode.ConvertAndAddAnnotations};
 			if(!modes.Contains(mode))
-				throw new ArgumentOutOfRangeException(nameof(mode), mode, $"Use only {string.Join(", ", modes)}");
+				throw new ArgumentOutOfRangeException(nameof(mode), mode, $"Mode '${mode}' is not supported. Use only {string.Join(", ", modes)}");
 
 			_mode = mode;
 		}
