@@ -20,7 +20,7 @@ Usage
 Tool is located at "PROJECT_DIR/packages/CodeContractsRemover.VERSION/tools/".
 
 ```bash
-CodeContractsRemover.exe <Convert|Remove|Stats> <directoryPath> [--searchPattern *.cs *.csproj] [--encoding utf-8] [--ignorePattern .svn/ ]
+CodeContractsRemover.exe <Convert|Stats> <directoryPath> [--searchPattern *.cs *.csproj] [--encoding utf-8] [--ignorePattern .svn/ ]
 ```
 Example
 ```bash
@@ -47,7 +47,7 @@ To run using [mono](http://www.mono-project.com/download/#download-lin) on Linux
 - Preserves all other [Contract](https://msdn.microsoft.com/en-us/library/system.diagnostics.contracts.contract(v=vs.110).aspx) invocations (including Attributes and Contract classes).
 - Removes CodeContract properties and constants from project files
 
-#### Mode - Remove
+~~#### Mode - Remove~~
 - Removes any [Contract](https://msdn.microsoft.com/en-us/library/system.diagnostics.contracts.contract(v=vs.110).aspx) invocations.
 - Invariant methods are preserved
 - Attributes and Contract classes are removed
