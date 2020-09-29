@@ -38,7 +38,7 @@ To run using [mono](http://www.mono-project.com/download/#download-lin) on Linux
 #### Mode - Convert
 - Converts all [Contract.Requires](https://msdn.microsoft.com/en-us/library/system.diagnostics.contracts.contract.requires(v=vs.110).aspx) to "if(!x) throw new ArgumentException()" pattern at the beginning of method/property/constructor.
 - Converts all [Contract.Ensures](https://docs.microsoft.com/en-us/dotnet/api/system.diagnostics.contracts.contract.ensures?view=netcore-3.1) to "if(!x) throw new InvalidOperationException()" pattern before each return incide method/property/constructor.
-- Converts all [Contract.Assert](https://msdn.microsoft.com/en-us/library/system.diagnostics.contracts.contract.assert(v=vs.110).aspx) and [Contract.Assume](https://docs.microsoft.com/en-us/dotnet/api/system.diagnostics.contracts.contract.assume?view=netcore-3.1) to "if(!x) throw new ArgumentException()" pattern.
+- Converts all [Contract.Assert](https://msdn.microsoft.com/en-us/library/system.diagnostics.contracts.contract.assert(v=vs.110).aspx), [Contract.Assume](https://docs.microsoft.com/en-us/dotnet/api/system.diagnostics.contracts.contract.assume?view=netcore-3.1) and [Contract.Invariant](https://docs.microsoft.com/en-us/dotnet/api/system.diagnostics.contracts.contract.invariant?view=netcore-3.1) to "if(!x) throw new InvalidOperationException()" pattern.
 - Invokes invariant methods before each return incide method/property/constructor.
 - Preserves all other [Contract](https://msdn.microsoft.com/en-us/library/system.diagnostics.contracts.contract(v=vs.110).aspx) invocations (including Attributes and Contract classes).
 - Removes CodeContract properties and constants from project files
