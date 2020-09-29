@@ -1,0 +1,89 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net472</TargetFramework>
+    <ProjectTypeGuids>{3AC096D0-A1C2-E12C-1390-A8335801FDAB};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
+    <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>
+    <ReferencePath>$(ProgramFiles)\Common Files\microsoft shared\VSTT\$(VisualStudioVersion)\UITestExtensionPackages</ReferencePath>
+    <IsCodedUITest>False</IsCodedUITest>
+    <TestProjectType>UnitTest</TestProjectType>
+    <AssemblyTitle>CodeContractsRemoverTests</AssemblyTitle>
+    <Product>CodeContractsRemoverTests</Product>
+    <Copyright>Copyright ©  2020</Copyright>
+    <OutputPath>bin\$(Configuration)\</OutputPath>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugType>full</DebugType>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+  </PropertyGroup>
+  <Import Project="$(VSToolsPath)\TeamTest\Microsoft.TestTools.targets" Condition="Exists('$(VSToolsPath)\TeamTest\Microsoft.TestTools.targets')" />
+  <ItemGroup>
+    <Compile Remove="ContractCSharpSyntaxRewriterTests.Convert_IntegrationTest.approved.cs" />
+    <Compile Remove="ContractRemoverTests.Process_ConvertMode_ResultIsCorrect.approved.cs" />
+    <Compile Remove="ContractRemoverTests.Process_ExtensionsCase_ResultIsCorrect.approved.cs" />
+    <Compile Remove="ContractRemoverTests.Process_FileWithLeadingComments_LeadingCommentsArePreserved.approved.cs" />
+    <Compile Remove="ContractRemoverTests.Process_StringNotNullOrEmptyCase_ResultIsCorrect.approved.cs" />
+    <Compile Remove="TestCases\ExtensionsCase.cs" />
+    <Compile Remove="TestCases\FileWithLeadingComments.cs" />
+    <Compile Remove="TestCases\NothingToModify.cs" />
+    <Compile Remove="TestCases\StringNotNullOrEmptyCase.cs" />
+    <Compile Remove="TestCases\TestSubject.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="TestCases\StringNotNullOrEmptyCase.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="TestCases\ExtensionsCase.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="TestCases\NothingToModify.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="TestCases\FileWithLeadingComments.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="ContractRemoverTests.Process_ConvertMode_ResultIsCorrect.approved.cs" />
+    <Content Include="TestCases\Project.csproj">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <None Include="ContractRemoverTests.Process_ExtensionsCase_ResultIsCorrect.approved.cs" />
+    <None Include="ContractRemoverTests.Process_FileWithLeadingComments_LeadingCommentsArePreserved.approved.cs" />
+    <None Include="ContractRemoverTests.Process_StringNotNullOrEmptyCase_ResultIsCorrect.approved.cs" />
+    <None Include="ProjectContractRemoverTests.Process_AddAnnotations_CodeContractsRemoved.approved.csproj" />
+    <None Include="ProjectContractRemoverTests.Process_AddAnnotations_ReferenceToJJAAdded.approved.csproj" />
+    <None Include="ProjectContractRemoverTests.Process_CsProj_CodeContractsRemoved.approved.csproj" />
+    <None Include="ProjectContractRemoverTests.Process_IncludeAnnotationsIntoBinaries_ResultIsCorrect.approved.csproj" />
+    <None Include="TestCases\TestSubject.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="ApprovalTests" Version="5.4.2" />
+    <PackageReference Include="ApprovalUtilities" Version="5.4.2" />
+    <PackageReference Include="DiffEngine" Version="6.0.0" />
+    <PackageReference Include="EmptyFiles" Version="2.0.5" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="3.1.4" />
+    <PackageReference Include="Microsoft.Win32.Registry" Version="4.7.0" />
+    <PackageReference Include="NUnit" Version="3.12.0" />
+    <PackageReference Include="System.Data.SqlClient" Version="4.8.2" />
+    <PackageReference Include="System.Management" Version="4.7.0" />
+    <PackageReference Include="System.Runtime.InteropServices.RuntimeInformation" Version="4.3.0" />
+    <PackageReference Include="System.Security.AccessControl" Version="4.7.0" />
+    <PackageReference Include="System.Security.Principal.Windows" Version="4.7.0" />
+    <PackageReference Include="TextCopy" Version="4.2.0" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.0.1" />
+    <PackageReference Include="MSTest.TestAdapter" Version="1.4.0" />
+    <PackageReference Include="MSTest.TestFramework" Version="1.4.0" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\CodeContractsRemover\CodeContractsRemover.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Update="C:\Users\ishatalkin\.nuget\packages\mstest.testadapter\1.4.0\build\net45\..\_common\Microsoft.VisualStudio.TestPlatform.MSTestAdapter.PlatformServices.dll">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+</Project>

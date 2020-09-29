@@ -1,10 +1,10 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Linq;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.VisualBasic;
 using Microsoft.CodeAnalysis.VisualBasic.Syntax;
 
-namespace CodeContractsRemover
+namespace CodeContractsRemover.VB
 {
 	public class ContractVisualBasicSyntaxRewriter : VisualBasicSyntaxRewriter
 	{

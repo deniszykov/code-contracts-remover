@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -9,6 +9,8 @@ namespace CodeContractsRemover
 	public enum ContractReplacementMode
 	{
 		Remove = 0,
-		Convert
+		Convert,
+		ConvertAndAddAnnotations,
+		Stats
 	}
 }

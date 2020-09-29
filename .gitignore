@@ -23,3 +23,5 @@ bin/
 obj/
 packages/
 launchSettings.json
+
+*.bak

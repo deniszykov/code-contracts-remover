@@ -1,9 +1,11 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.28307.539
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30503.244
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CodeContractsRemover", "CodeContractsRemover\CodeContractsRemover.csproj", "{90B858BA-DFA8-46CC-B2D2-14CC3A01D7DC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CodeContractsRemover", "CodeContractsRemover\CodeContractsRemover.csproj", "{90B858BA-DFA8-46CC-B2D2-14CC3A01D7DC}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CodeContractsRemoverTests", "CodeContractsRemoverTests\CodeContractsRemoverTests.csproj", "{AC9715B8-A2E6-40D5-A254-B7AB992D9A1F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +17,10 @@ Global
 		{90B858BA-DFA8-46CC-B2D2-14CC3A01D7DC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{90B858BA-DFA8-46CC-B2D2-14CC3A01D7DC}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{90B858BA-DFA8-46CC-B2D2-14CC3A01D7DC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AC9715B8-A2E6-40D5-A254-B7AB992D9A1F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AC9715B8-A2E6-40D5-A254-B7AB992D9A1F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AC9715B8-A2E6-40D5-A254-B7AB992D9A1F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AC9715B8-A2E6-40D5-A254-B7AB992D9A1F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
