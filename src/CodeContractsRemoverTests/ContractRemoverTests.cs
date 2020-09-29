@@ -57,6 +57,20 @@ namespace CodeContractsRemoverTests
 	        Approvals.VerifyFile(file);
         }
 
+        [Test]
+        public void Process_StringNotNullOrEmptyCase_ResultIsCorrect()
+        {
+	        //Arrange
+	        var file = $"{nameof(Process_StringNotNullOrEmptyCase_ResultIsCorrect)}.received.cs";
+	        File.Copy(TestsHelper.GetInitialFileName(".\\TestCases\\StringNotNullOrEmptyCase.cs"), file);
+
+	        //Act
+	        ContractRemover.Process(file, ContractReplacementMode.ConvertAndAddAnnotations, Encoding.UTF8);
+
+	        //Assert
+	        Approvals.VerifyFile(file);
+        }
+
 		[Test]
         public void Process_NothingToModify_FileNotModified()
         {

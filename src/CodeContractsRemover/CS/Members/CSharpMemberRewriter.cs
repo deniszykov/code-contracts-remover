@@ -256,7 +256,7 @@ namespace CodeContractsRemover.CS.Members
 		public override SyntaxNode VisitParameter(ParameterSyntax node)
 		{
 			var paramChecks = _memberContract.Requires.Where(r => r.IdName == node.Identifier.ValueText).ToArray();
-			if (paramChecks.Any(c => c.IsNotNullCheck))
+			if (paramChecks.Any(c => c.IsNotNullOrEmptyCheck))
 			{
 				var attributeLists = node.AttributeLists.AddAttr("NotNull");
 				node = node.WithAttributeLists(attributeLists).NormalizeWhitespace();

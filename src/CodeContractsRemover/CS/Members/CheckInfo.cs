@@ -18,7 +18,17 @@ namespace CodeContractsRemover.CS.Members
 				? node.ArgumentList.Arguments[1].Expression
 				: SyntaxFactory.LiteralExpression(SyntaxKind.StringLiteralExpression,
 					SyntaxFactory.Literal("Contract assertion not met: " + Condition));
-			Id = Condition.DescendantNodes().OfType<IdentifierNameSyntax>().FirstOrDefault();
+			var firstId = Condition.DescendantNodes().OfType<IdentifierNameSyntax>().FirstOrDefault();
+			if (firstId?.Identifier.ValueText == nameof(string.IsNullOrEmpty))
+			{
+				_isNotNullOrEmptyCheck = Condition.IsKind(SyntaxKind.LogicalNotExpression);
+				Id = Condition.DescendantNodes().OfType<IdentifierNameSyntax>().Except(new []{firstId}).FirstOrDefault();
+			}
+			else
+			{
+				_isNotNullOrEmptyCheck = false;
+				Id = firstId;
+			}
 
 			IsResultCheck = Condition.DescendantNodes().OfType<InvocationExpressionSyntax>()
 				.Any(i =>
@@ -58,8 +68,10 @@ namespace CodeContractsRemover.CS.Members
 
 		public bool IsNullCheck => Condition.IsNullCheck();
 
-		public bool IsNotNullCheck =>
-			IsNullCheck && Condition.IsKind(SyntaxKind.NotEqualsExpression);
+		private readonly bool _isNotNullOrEmptyCheck;
+
+		public bool IsNotNullOrEmptyCheck =>
+			_isNotNullOrEmptyCheck || IsNullCheck && Condition.IsKind(SyntaxKind.NotEqualsExpression);
 
 		public bool IsRangeCheck => Condition.IsRangeCheck();
 

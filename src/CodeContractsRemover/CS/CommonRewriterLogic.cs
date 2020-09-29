@@ -17,7 +17,7 @@ namespace CodeContractsRemover.CS
 
 		public void AddAnnotationAttrs(INodeWithAttrs node, TriviaInfo triviaInfo, SyntaxTriviaList leadingTrivia)
 		{
-			if (_memberContract.Ensures.Any(r => r.IsNotNullCheck && r.IsResultCheck))
+			if (_memberContract.Ensures.Any(r => r.IsNotNullOrEmptyCheck && r.IsResultCheck))
 			{
 				node.LeadingTrivia = TriviaList(triviaInfo.EndOfLine.Concat(triviaInfo.BaseWhitespace));
 				node.AttributeLists = node.AttributeLists.AddAttr("NotNull");
