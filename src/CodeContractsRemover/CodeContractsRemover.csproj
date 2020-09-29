@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>net472</TargetFramework>
     <Authors>Denis Zykov</Authors>
@@ -59,8 +59,8 @@
       <ILRepack Condition="'$(ILRepack)' == ''">$(NuGetPackageRoot)ilrepack\2.1.0-beta1\tools\ILRepack.exe</ILRepack>
       <ILRepackTargetPlatform>v4,$(FrameworkPath)</ILRepackTargetPlatform>
       <IlRepackSignKey>$(ProjectDir)sign.snk</IlRepackSignKey>
-      <IlRepackAllowDup>@(AllowDup-&gt;'"/allowdup:%(Identity)"', ' ')</IlRepackAllowDup>
-      <IlRepackTargets>@(RapackTarget-&gt;'"%(Identity)"', ' ')</IlRepackTargets>
+      <IlRepackAllowDup>@(AllowDup->'"/allowdup:%(Identity)"', ' ')</IlRepackAllowDup>
+      <IlRepackTargets>@(RapackTarget->'"%(Identity)"', ' ')</IlRepackTargets>
     </PropertyGroup>
     <Exec Command="&quot;$(ILRepack)&quot; /target:exe &quot;/targetplatform:$(ILRepackTargetPlatform)&quot; &quot;/keyfile:$(IlRepackSignKey)&quot; /xmldocs /union /parallel /internalize $(IlRepackAllowDup) &quot;/out:$(TargetPath)&quot; &quot;$(TargetPath)&quot; $(IlRepackTargets)" WorkingDirectory="$(ProjectDir)" />
     <Delete Files="@(RapackTarget)" />

@@ -1,0 +1,7 @@
+[ContractClassFor]                                	  1
+[ContractInvariantMethod]                         	  2
+Contract.Assert                                   	  1
+Contract.Ensures                                  	  6
+Contract.Invariant                                	  2
+Contract.Requires                                 	  6
+Contract.Result                                   	  5

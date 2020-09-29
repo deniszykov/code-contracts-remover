@@ -1,17 +1,16 @@
-using System;
 using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CSharp;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
+using InvocationExpressionSyntax = Microsoft.CodeAnalysis.CSharp.Syntax.InvocationExpressionSyntax;
 
-namespace CodeContractsRemover
+namespace CodeContractsRemover.CS.Members
 {
-	public class ContractCSharpFinder : SyntaxWalker
+	/// <summary> Finds ctor's, method's or property's contract </summary>
+	public class CSharpMemberContractFinder : SyntaxWalker
 	{
-		private readonly ContractInfo _contractInfo = new ContractInfo();
+		private readonly MemberContractInfo _contractInfo;
 
-		private ContractCSharpFinder(MethodDeclarationSyntax node)
+		private CSharpMemberContractFinder(MemberContractInfo contractInfo)
 		{
-			_contractInfo.Member = node;
+			_contractInfo = contractInfo;
 		}
 
 		/// <summary>
@@ -32,11 +31,11 @@ namespace CodeContractsRemover
 
 			if (invInfo.Class == "Contract" && invInfo.Method == "Ensures")
 			{
-				_contractInfo.Ensures.Add(invNode);
+				_contractInfo.Ensures.Add(new CheckInfo(invNode));
 			}
 			else if (invInfo.Class == "Contract" && invInfo.Method == "Requires")
 			{
-				_contractInfo.Requires.Add(invNode);
+				_contractInfo.Requires.Add(new CheckInfo(invNode));
 			}
 			else
 			{
@@ -44,13 +43,10 @@ namespace CodeContractsRemover
 			}
 		}
 
-		public static ContractInfo Look(MethodDeclarationSyntax node)
+		public static void InitContract(MemberContractInfo contractInfo)
 		{
-			if (node == null) throw new ArgumentNullException(nameof(node));
-
-			var finder = new ContractCSharpFinder(node);
-			finder.Visit(node);
-			return finder._contractInfo;
+			var finder = new CSharpMemberContractFinder(contractInfo);
+			finder.Visit(contractInfo.Member);
 		}
 	}
 }

@@ -2,7 +2,7 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
-namespace CodeContractsRemover
+namespace CodeContractsRemover.CS.Members
 {
 	public class ContractResultRewriter : CSharpSyntaxRewriter
 	{
@@ -15,11 +15,8 @@ namespace CodeContractsRemover
 
 		public override SyntaxNode VisitInvocationExpression(InvocationExpressionSyntax node)
 		{
-			var assessExpression = node.Expression as MemberAccessExpressionSyntax;
-			var contractTypeRef = assessExpression?.Expression as IdentifierNameSyntax;
-			var contractMethodRef = assessExpression?.Name.Identifier.ValueText ?? "";
-
-			if (contractTypeRef?.Identifier.ValueText == "Contract" && contractMethodRef == "Result")
+			var info = new InvocationInfo(node);
+			if (info.Class == "Contract" && info.Method == "Result")
 			{
 				return SyntaxFactory.IdentifierName(_varName);
 			}

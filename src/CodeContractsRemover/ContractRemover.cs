@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
+using CodeContractsRemover.CS;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.VisualBasic;
 
@@ -23,7 +24,7 @@ namespace CodeContractsRemover
 			"ContractPublicPropertyNameAttribute","ContractReferenceAssemblyAttribute", "ContractRuntimeIgnoredAttribute","ContractVerificationAttribute", "PureAttribute",
 		};
 
-		public static void Process(string filePath, ContractReplacementMode mode, Encoding encoding)
+		public static bool Process(string filePath, ContractReplacementMode mode, Encoding encoding)
 		{
 			if (filePath == null) throw new ArgumentNullException(nameof(filePath));
 			if (encoding == null) throw new ArgumentNullException(nameof(encoding));
@@ -34,12 +35,19 @@ namespace CodeContractsRemover
 			if (filePath.EndsWith(".cs", StringComparison.OrdinalIgnoreCase))
 			{
 				var tree = CSharpSyntaxTree.ParseText(File.ReadAllText(filePath, encoding), CSharpParseOptions.Default, filePath, encoding);
-				var visitor = new ContractCSharpSyntaxRewriter(mode);
-				var newRoot = visitor.Visit(tree.GetRoot());
-				changed = newRoot != tree.GetRoot();
-				if (changed)
-					File.WriteAllText(filePath, newRoot.ToString(), encoding);
-
+				if (mode == ContractReplacementMode.Stats)
+				{
+					var visitor = new CSharpStatsCollector();
+					visitor.Visit(tree.GetRoot());
+				}
+				else
+				{
+					var visitor = new ContractCSharpSyntaxRewriter(mode);
+					var newRoot = visitor.Visit(tree.GetRoot());
+					changed = newRoot != tree.GetRoot();
+					if (changed)
+						File.WriteAllText(filePath, newRoot.ToFullString(), encoding);
+				}
 			}
 			else if (filePath.EndsWith(".vb", StringComparison.OrdinalIgnoreCase))
 			{
@@ -48,7 +56,7 @@ namespace CodeContractsRemover
 				var newRoot = visitor.Visit(tree.GetRoot());
 				changed = newRoot != tree.GetRoot();
 				if (changed)
-					File.WriteAllText(filePath, newRoot.ToString(), encoding);
+					File.WriteAllText(filePath, newRoot.ToFullString(), encoding);
 			}
 			else
 			{
@@ -59,6 +67,8 @@ namespace CodeContractsRemover
 				Console.WriteLine("Modified.");
 			else
 				Console.WriteLine("Not Modified.");
+
+			return changed;
 		}
 	}
 }

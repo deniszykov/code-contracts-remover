@@ -1,6 +1,7 @@
 using System.Linq;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
+using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 using CSharpExtensions = Microsoft.CodeAnalysis.CSharpExtensions;
 
 namespace CodeContractsRemover
@@ -11,24 +12,21 @@ namespace CodeContractsRemover
 
 		public TriviaInfo(SyntaxNode node)
 		{
-			// this includes comments
-			LeadingTrivia = node.GetLeadingTrivia();
-			// this is exclusively indention
-			BaseWhitespace = SyntaxFactory.TriviaList(LeadingTrivia.Reverse().TakeWhile(stt => CSharpExtensions.IsKind((SyntaxTrivia) stt, SyntaxKind.WhitespaceTrivia))
+			BaseWhitespace = TriviaList(node.GetLeadingTrivia().Reverse()
+				.TakeWhile(stt => stt.IsKind(SyntaxKind.WhitespaceTrivia))
 				.Reverse());
 			IndentedWhitespace = AddIndent(BaseWhitespace);
 			EndOfLine = node.GetTrailingTrivia();
-			SpaceList = SyntaxFactory.TriviaList(SyntaxFactory.Space);
+			SpaceList = TriviaList(Space);
 		}
 
 		private SyntaxTriviaList AddIndent(SyntaxTriviaList trivia)
 		{
-			return trivia.Add(SyntaxFactory.Whitespace(Indent));
+			return trivia.Add(Whitespace(Indent));
 		}
 
 		private TriviaInfo() { }
 
-		public SyntaxTriviaList LeadingTrivia { get; private set; }
 		public SyntaxTriviaList BaseWhitespace { get; private set; }
 		public SyntaxTriviaList IndentedWhitespace { get; private set; }
 		public SyntaxTriviaList EndOfLine { get; private set; }
@@ -38,7 +36,6 @@ namespace CodeContractsRemover
 		{
 			return new TriviaInfo
 			{
-				LeadingTrivia = AddIndent(LeadingTrivia),
 				BaseWhitespace = AddIndent(BaseWhitespace),
 				IndentedWhitespace = AddIndent(IndentedWhitespace),
 				EndOfLine = EndOfLine,
