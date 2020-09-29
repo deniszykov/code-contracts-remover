@@ -74,3 +74,7 @@ Include annotations only for work in Visual Studio/Rider before compilation. Whe
 #### Mode - IncludeIntoBinaries
 Annotations will be included into binaries, so Rider/Re# would show hints before and after compilation (when binary is referenced into other project). This mode is recommended for packages. Read more on [Jet Brains site](https://blog.jetbrains.com/dotnet/2015/08/12/how-to-use-jetbrains-annotations-to-improve-resharper-inspections/).
 		
+# Contributors
+@ishatalkin
+@mgaffigan
+
