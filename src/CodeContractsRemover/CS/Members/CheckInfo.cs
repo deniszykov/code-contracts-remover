@@ -2,6 +2,7 @@ using System.Linq;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 
 namespace CodeContractsRemover.CS.Members
 {
@@ -14,10 +15,7 @@ namespace CodeContractsRemover.CS.Members
 			ExceptionType = (accessExpression?.Name as GenericNameSyntax)?.TypeArgumentList.Arguments.FirstOrDefault();
 
 			Condition = node.ArgumentList.Arguments[0].Expression;
-			Message = node.ArgumentList.Arguments.Count > 1
-				? node.ArgumentList.Arguments[1].Expression
-				: SyntaxFactory.LiteralExpression(SyntaxKind.StringLiteralExpression,
-					SyntaxFactory.Literal("Contract assertion not met: " + Condition));
+
 			var firstId = Condition.DescendantNodes().OfType<IdentifierNameSyntax>().FirstOrDefault();
 			if (firstId?.Identifier.ValueText == nameof(string.IsNullOrEmpty))
 			{
@@ -28,6 +26,23 @@ namespace CodeContractsRemover.CS.Members
 			{
 				_isNotNullOrEmptyCheck = false;
 				Id = firstId;
+			}
+
+			if (node.ArgumentList.Arguments.Count > 1)
+			{
+				Message = node.ArgumentList.Arguments[1].Expression;
+			}
+			else
+			{
+				var conditionForMsg = new ContractResultRewriter("$result").Visit(Condition)
+					.NormalizeWhitespace().ToString();
+				if (!string.IsNullOrEmpty(IdName))
+				{
+					conditionForMsg = conditionForMsg.Replace(IdName, $"{{nameof({IdName})}}");
+				}
+
+				Message = ParseExpression($"$\"Contract assertion not met: {conditionForMsg}\"");
+
 			}
 
 			IsResultCheck = Condition.DescendantNodes().OfType<InvocationExpressionSyntax>()

@@ -217,7 +217,8 @@ namespace CodeContractsRemover.CS.Members
 			var exceptionMethods = new[] {"Assert", "Assume", "Invariant"};
 			if (invInfo.Class == "Contract" && exceptionMethods.Contains(invInfo.Method))
 			{
-				return GenerateArgException(new CheckInfo(invNode));
+				var checkInfo = new CheckInfo(invNode);
+				return GenerateInvalidOperationException(checkInfo.Condition, checkInfo.Message, new TriviaInfo(node));
 			}
 
 			var removeMethods = new[] { "Requires", "Ensures" };
@@ -271,15 +272,14 @@ namespace CodeContractsRemover.CS.Members
 
 		private StatementSyntax GenerateArgException(CheckInfo checkInfo)
 		{
-			var nsPrefix = GetNsPrefix(_memberContract.Member);
 			var parameters = GetParameters(_memberContract.Member);
 			var exceptionType = checkInfo.ExceptionType ??
 			                    (
 				                    checkInfo.IsNullCheck
-					                    ? ParseTypeName(nsPrefix + "ArgumentNullException")
+					                    ? ParseTypeName(ExceptionNs + "ArgumentNullException")
 					                    : checkInfo.IsRangeCheck
-						                    ? ParseTypeName(nsPrefix + "ArgumentOutOfRangeException")
-						                    : ParseTypeName(nsPrefix + "ArgumentException")
+						                    ? ParseTypeName(ExceptionNs + "ArgumentOutOfRangeException")
+						                    : ParseTypeName(ExceptionNs + "ArgumentException")
 			                    );
 
 			var paramNameRef = parameters.Contains(checkInfo.IdName)
@@ -297,6 +297,14 @@ namespace CodeContractsRemover.CS.Members
 
 			return GenerateThrow(checkInfo.Condition, exceptionType, new TriviaInfo(checkInfo.Invocation.Parent),
 				exceptionParams);
+		}
+
+		private StatementSyntax GenerateInvalidOperationException(ExpressionSyntax checkExpr, ExpressionSyntax message,
+			TriviaInfo trivias)
+		{
+			var exceptionType = ParseTypeName($"{ExceptionNs}InvalidOperationException");
+			return GenerateThrow(checkExpr, exceptionType, trivias,
+				message);
 		}
 
 		#endregion
@@ -355,16 +363,13 @@ namespace CodeContractsRemover.CS.Members
 
 		private List<StatementSyntax> GenerateEnsures(string varName, TriviaInfo trivias)
 		{
-			var nsPrefix = GetNsPrefix(_memberContract.Member);
-			var exceptionType = ParseTypeName($"{nsPrefix}InvalidOperationException");
-
 			var statements = new List<StatementSyntax>(_memberContract.Ensures.Count
 			                                           + (NeedInvariantBlock ? Invariants.Count : 0));
 			foreach (var ensure in _memberContract.Ensures)
 			{
 				var checkExpr = new ContractResultRewriter(varName).Visit(ensure.Condition).NormalizeWhitespace();
-				statements.Add(GenerateThrow((ExpressionSyntax) checkExpr, exceptionType, trivias,
-					ensure.Message));
+				var statementSyntax = GenerateInvalidOperationException((ExpressionSyntax) checkExpr, ensure.Message, trivias);
+				statements.Add(statementSyntax);
 			}
 
 			if (NeedInvariantBlock)
@@ -472,10 +477,7 @@ namespace CodeContractsRemover.CS.Members
 			return identifiers;
 		}
 
-		private string GetNsPrefix(SyntaxNode node)
-		{
-			return this.HasNamespace("System", node.SyntaxTree) ? "" : "System.";
-		}
+		private string ExceptionNs => this.HasNamespace("System", _memberContract.Member.SyntaxTree) ? "" : "System.";
 
 		private bool HasNamespace(string namespaceName, SyntaxTree tree)
 		{

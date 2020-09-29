@@ -6,7 +6,7 @@ namespace Test
 	{
 		public static string AsString([NotNull] this string value)
 		{
-			if (value == null) throw new System.ArgumentNullException(nameof(value), "Contract assertion not met: value != null");
+			if (value == null) throw new System.ArgumentNullException(nameof(value), $"Contract assertion not met: {nameof(value)} != null");
 			return value;
 		}
 	}
