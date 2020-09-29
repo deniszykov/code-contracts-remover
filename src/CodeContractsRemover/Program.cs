@@ -7,7 +7,7 @@ using CodeContractsRemover.CS;
 
 namespace CodeContractsRemover
 {
-	[Description("usage CodeContractsRemover.exe <Convert|Remove> <directoryPath> [--searchPattern *.cs *.csproj] [--encoding utf-8] [--ignorePattern .svn/ ]")]
+	[Description("usage CodeContractsRemover.exe <Convert|Remove|Stats> [--directoryPath .] [--searchPattern *.cs *.csproj] [--encoding utf-8] [--ignorePattern .svn/] [--annotations Add]")]
 	public static class Program
 	{
 		private static readonly string[] DefaultSearchPattern = new[] { "*.cs", "*.vb", "*.csproj", "*.vbproj" };

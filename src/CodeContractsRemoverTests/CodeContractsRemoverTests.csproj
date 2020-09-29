@@ -46,6 +46,10 @@
     </Content>
     <None Include="ContractRemoverTests.Process_ExtensionsCase_ResultIsCorrect.approved.cs" />
     <None Include="ContractRemoverTests.Process_FileWithLeadingComments_LeadingCommentsArePreserved.approved.cs" />
+    <None Include="ProjectContractRemoverTests.Process_AddAnnotations_CodeContractsRemoved.approved.csproj" />
+    <None Include="ProjectContractRemoverTests.Process_AddAnnotations_ReferenceToJJAAdded.approved.csproj" />
+    <None Include="ProjectContractRemoverTests.Process_CsProj_CodeContractsRemoved.approved.csproj" />
+    <None Include="ProjectContractRemoverTests.Process_IncludeAnnotationsIntoBinaries_ResultIsCorrect.approved.csproj" />
     <None Include="TestCases\TestSubject.cs">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
