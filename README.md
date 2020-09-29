@@ -51,6 +51,7 @@ To run using [mono](http://www.mono-project.com/download/#download-lin) on Linux
 
 #### Mode - Stats
 - Collects statistics about how [Contracts](https://msdn.microsoft.com/en-us/library/system.diagnostics.contracts.contract(v=vs.110).aspx) are used. Example of result:
+```
 [ContractClassFor]                                	  1
 [ContractInvariantMethod]                         	  2
 Contract.Assert                                   	  1
@@ -58,6 +59,7 @@ Contract.Ensures                                  	  6
 Contract.Invariant                                	  2
 Contract.Requires                                 	  6
 Contract.Result                                   	  5
+```
 
 ## Annotation modes
 
