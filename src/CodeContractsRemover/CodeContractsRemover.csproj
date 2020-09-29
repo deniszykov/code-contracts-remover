@@ -1,85 +1,85 @@
 <Project Sdk="Microsoft.NET.Sdk">
-  <PropertyGroup>
-    <TargetFramework>net472</TargetFramework>
-    <Authors>Denis Zykov, ishatalkin, mgaffigan</Authors>
-    <Version>1.0.7</Version>
-    <PackageProjectUrl>https://github.com/deniszykov/code-contracts-remover</PackageProjectUrl>
-    <PackageLicenseUrl>https://raw.githubusercontent.com/deniszykov/code-contracts-remover/master/LICENSE</PackageLicenseUrl>
-    <Copyright>(c) Denis Zykov, ishatalkin, mgaffigan</Copyright>
-    <RepositoryUrl>https://github.com/deniszykov/code-contracts-remover</RepositoryUrl>
-    <RepositoryType>git</RepositoryType>
-    <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
-    <PackageTags>code contracts tool</PackageTags>
-    <PackageReleaseNotes />
-    <ApplicationIcon />
-    <OutputType>Exe</OutputType>
-    <StartupObject />
-    <IsTool>true</IsTool>
-  </PropertyGroup>
-  <Target Name="Repack" AfterTargets="BuiltProjectOutputGroup" Condition="' $(TargetFramework)' != '' AND '$(GeneratePackageOnBuild)' == 'true' ">
-    <GetFrameworkPath>
-      <Output TaskParameter="Path" PropertyName="FrameworkPath" />
-    </GetFrameworkPath>
-    <ItemGroup>
-      <NetPlatformFolders Include="$(NuGetPackageFolders.Split(';'))" />
-    </ItemGroup>
-    <ItemGroup>
-      <AllowDup Include="JetBrains.%2A" />
-    </ItemGroup>
-    <ItemGroup>
-      <RapackTarget Include="$(TargetDir)Microsoft.Build.Framework.dll" />
-      <RapackTarget Include="$(TargetDir)Microsoft.Build.dll" />
-      <RapackTarget Include="$(TargetDir)Microsoft.Build.Framework.dll" />
-      <RapackTarget Include="$(TargetDir)Microsoft.CodeAnalysis.CSharp.dll" />
-      <RapackTarget Include="$(TargetDir)Microsoft.CodeAnalysis.CSharp.Workspaces.dll" />
-      <RapackTarget Include="$(TargetDir)Microsoft.CodeAnalysis.dll" />
-      <RapackTarget Include="$(TargetDir)Microsoft.CodeAnalysis.VisualBasic.dll" />
-      <RapackTarget Include="$(TargetDir)Microsoft.CodeAnalysis.dll" />
-      <RapackTarget Include="$(TargetDir)Microsoft.CodeAnalysis.VisualBasic.dll" />
-      <RapackTarget Include="$(TargetDir)Microsoft.CodeAnalysis.VisualBasic.Workspaces.dll" />
-      <RapackTarget Include="$(TargetDir)Microsoft.CodeAnalysis.Workspaces.dll" />
-      <RapackTarget Include="$(TargetDir)System.Buffers.dll" />
-      <RapackTarget Include="$(TargetDir)System.Collections.Immutable.dll" />
-      <RapackTarget Include="$(TargetDir)System.Composition.AttributedModel.dll" />
-      <RapackTarget Include="$(TargetDir)System.Composition.Convention.dll" />
-      <RapackTarget Include="$(TargetDir)System.Composition.Hosting.dll" />
-      <RapackTarget Include="$(TargetDir)System.Composition.Runtime.dll" />
-      <RapackTarget Include="$(TargetDir)System.Composition.TypedParts.dll" />
-      <RapackTarget Include="$(TargetDir)System.Memory.dll" />
-      <RapackTarget Include="$(TargetDir)System.Numerics.Vectors.dll" />
-      <RapackTarget Include="$(TargetDir)System.Reflection.Metadata.dll" />
-      <RapackTarget Include="$(TargetDir)System.Text.Encoding.CodePages.dll" />
-      <RapackTarget Include="$(TargetDir)System.Threading.Tasks.Dataflow.dll" />
-      <RapackTarget Include="$(TargetDir)System.Threading.Tasks.Extensions.dll" />
-      <RapackTarget Include="$(TargetDir)ConsoleApp.CommandLine.dll" />
-      <RapackTarget Include="$(TargetDir)Microsoft.VisualStudio.Setup.Configuration.Interop.dll" />
-      <RapackTarget Include="$(TargetDir)System.Runtime.CompilerServices.Unsafe.dll" />
-    </ItemGroup>
-    <PropertyGroup>
-      <ILRepack Condition="'$(ILRepack)' == ''">$(NuGetPackageRoot)ilrepack\2.1.0-beta1\tools\ILRepack.exe</ILRepack>
-      <ILRepackTargetPlatform>v4,$(FrameworkPath)</ILRepackTargetPlatform>
-      <IlRepackSignKey>$(ProjectDir)sign.snk</IlRepackSignKey>
-      <IlRepackAllowDup>@(AllowDup->'"/allowdup:%(Identity)"', ' ')</IlRepackAllowDup>
-      <IlRepackTargets>@(RapackTarget->'"%(Identity)"', ' ')</IlRepackTargets>
-    </PropertyGroup>
-    <Exec Command="&quot;$(ILRepack)&quot; /target:exe &quot;/targetplatform:$(ILRepackTargetPlatform)&quot; &quot;/keyfile:$(IlRepackSignKey)&quot; /xmldocs /union /parallel /internalize $(IlRepackAllowDup) &quot;/out:$(TargetPath)&quot; &quot;$(TargetPath)&quot; $(IlRepackTargets)" WorkingDirectory="$(ProjectDir)" />
-    <Delete Files="@(RapackTarget)" />
-  </Target>
-  <ItemGroup>
-    <Compile Remove="Temp\**" />
-    <EmbeddedResource Remove="Temp\**" />
-    <None Remove="Temp\**" />
-  </ItemGroup>
-  <ItemGroup>
-    <PackageReference Include="ConsoleApp.CommandLine" Version="1.3.2" />
-    <PackageReference Include="Microsoft.Build" Version="16.0.461" />
-    <PackageReference Include="Microsoft.CodeAnalysis" Version="3.0.0" />
-    <PackageReference Include="ILRepack" Version="2.1.0-beta1" />
-  </ItemGroup>
-  <ItemGroup>
-    <Service Include="{508349b6-6b84-4df5-91f0-309beebad82d}" />
-  </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Properties\" />
-  </ItemGroup>
+	<PropertyGroup>
+		<TargetFramework>net472</TargetFramework>
+		<Authors>Denis Zykov, ishatalkin, mgaffigan</Authors>
+		<Version>1.0.8</Version>
+		<PackageProjectUrl>https://github.com/deniszykov/code-contracts-remover</PackageProjectUrl>
+		<PackageLicenseUrl>https://raw.githubusercontent.com/deniszykov/code-contracts-remover/master/LICENSE</PackageLicenseUrl>
+		<Copyright>(c) Denis Zykov, ishatalkin, mgaffigan</Copyright>
+		<RepositoryUrl>https://github.com/deniszykov/code-contracts-remover</RepositoryUrl>
+		<RepositoryType>git</RepositoryType>
+		<CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+		<PackageTags>code contracts tool</PackageTags>
+		<PackageReleaseNotes />
+		<ApplicationIcon />
+		<OutputType>Exe</OutputType>
+		<StartupObject />
+		<IsTool>true</IsTool>
+	
+</PropertyGroup>
+	<Target Name="Repack" AfterTargets="BuiltProjectOutputGroup" Condition=" '$(TargetFramework)' != '' AND '$(GeneratePackageOnBuild)' != '' ">
+		<GetFrameworkPath>
+			<Output TaskParameter="Path" PropertyName="FrameworkPath" />
+		</GetFrameworkPath>
+		<ItemGroup>
+			<NetPlatformFolders Include="$(NuGetPackageFolders.Split(';'))" />
+		</ItemGroup>
+		<ItemGroup>
+			<AllowDup Include="JetBrains.%2A" />
+		</ItemGroup>
+		<ItemGroup>
+			<RepackTarget Include="$(TargetDir)ConsoleApp.CommandLine.dll" />
+			<RepackTarget Include="$(TargetDir)Humanizer.dll" />
+			<RepackTarget Include="$(TargetDir)Microsoft.Bcl.AsyncInterfaces.dll" />
+			<RepackTarget Include="$(TargetDir)Microsoft.Build.dll" />
+			<RepackTarget Include="$(TargetDir)Microsoft.Build.Framework.dll" />
+			<RepackTarget Include="$(TargetDir)Microsoft.CodeAnalysis.CSharp.dll" />
+			<RepackTarget Include="$(TargetDir)Microsoft.CodeAnalysis.CSharp.Workspaces.dll" />
+			<RepackTarget Include="$(TargetDir)Microsoft.CodeAnalysis.dll" />
+			<RepackTarget Include="$(TargetDir)Microsoft.CodeAnalysis.VisualBasic.dll" />
+			<RepackTarget Include="$(TargetDir)Microsoft.CodeAnalysis.VisualBasic.Workspaces.dll" />
+			<RepackTarget Include="$(TargetDir)Microsoft.CodeAnalysis.Workspaces.dll" />
+			<RepackTarget Include="$(TargetDir)Microsoft.VisualStudio.Setup.Configuration.Interop.dll" />
+			<RepackTarget Include="$(TargetDir)System.Buffers.dll" />
+			<RepackTarget Include="$(TargetDir)System.Collections.Immutable.dll" />
+			<RepackTarget Include="$(TargetDir)System.Composition.AttributedModel.dll" />
+			<RepackTarget Include="$(TargetDir)System.Composition.Convention.dll" />
+			<RepackTarget Include="$(TargetDir)System.Composition.Hosting.dll" />
+			<RepackTarget Include="$(TargetDir)System.Composition.Runtime.dll" />
+			<RepackTarget Include="$(TargetDir)System.Composition.TypedParts.dll" />
+			<RepackTarget Include="$(TargetDir)System.Memory.dll" />
+			<RepackTarget Include="$(TargetDir)System.Numerics.Vectors.dll" />
+			<RepackTarget Include="$(TargetDir)System.Reflection.Metadata.dll" />
+			<RepackTarget Include="$(TargetDir)System.Runtime.CompilerServices.Unsafe.dll" />
+			<RepackTarget Include="$(TargetDir)System.Text.Encoding.CodePages.dll" />
+			<RepackTarget Include="$(TargetDir)System.Threading.Tasks.Dataflow.dll" />
+			<RepackTarget Include="$(TargetDir)System.Threading.Tasks.Extensions.dll" />
+		</ItemGroup>
+		<PropertyGroup>
+			<ILRepack Condition="'$(ILRepack)' == ''">$(NuGetPackageRoot)ilrepack\2.1.0-beta1\tools\ILRepack.exe</ILRepack>
+			<ILRepackTargetPlatform>v4,$(FrameworkPath)</ILRepackTargetPlatform>
+			<IlRepackSignKey>$(ProjectDir)sign.snk</IlRepackSignKey>
+			<IlRepackAllowDup>@(AllowDup->'"/allowdup:%(Identity)"', ' ')</IlRepackAllowDup>
+			<IlRepackTargets>@(RepackTarget->'"%(Identity)"', ' ')</IlRepackTargets>
+		</PropertyGroup>
+		<Exec Command="&quot;$(ILRepack)&quot; /target:exe &quot;/targetplatform:$(ILRepackTargetPlatform)&quot; &quot;/keyfile:$(IlRepackSignKey)&quot; /xmldocs /union /parallel /internalize $(IlRepackAllowDup) &quot;/out:$(TargetPath)&quot; &quot;$(TargetPath)&quot; $(IlRepackTargets)" WorkingDirectory="$(ProjectDir)" />
+		<Delete Files="@(RepackTarget)" />
+	</Target>
+	<ItemGroup>
+		<Compile Remove="Temp\**" />
+		<EmbeddedResource Remove="Temp\**" />
+		<None Remove="Temp\**" />
+	</ItemGroup>
+	<ItemGroup>
+		<PackageReference Include="ConsoleApp.CommandLine" Version="1.3.4" />
+		<PackageReference Include="Microsoft.Build" Version="16.6.0" />
+		<PackageReference Include="Microsoft.CodeAnalysis" Version="3.7.0" />
+		<PackageReference Include="ILRepack" Version="2.1.0-beta1" PrivateAssets="all" />
+	</ItemGroup>
+	<ItemGroup>
+		<Service Include="{508349b6-6b84-4df5-91f0-309beebad82d}" />
+	</ItemGroup>
+	<ItemGroup>
+		<Folder Include="Properties\" />
+	</ItemGroup>
 </Project>
