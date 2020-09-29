@@ -1,11 +1,11 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>net472</TargetFramework>
-    <Authors>Denis Zykov</Authors>
+    <Authors>Denis Zykov, ishatalkin, mgaffigan</Authors>
     <Version>1.0.7</Version>
     <PackageProjectUrl>https://github.com/deniszykov/code-contracts-remover</PackageProjectUrl>
     <PackageLicenseUrl>https://raw.githubusercontent.com/deniszykov/code-contracts-remover/master/LICENSE</PackageLicenseUrl>
-    <Copyright>(c) Denis Zykov, GameDevWare 2019</Copyright>
+    <Copyright>(c) Denis Zykov, ishatalkin, mgaffigan</Copyright>
     <RepositoryUrl>https://github.com/deniszykov/code-contracts-remover</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
