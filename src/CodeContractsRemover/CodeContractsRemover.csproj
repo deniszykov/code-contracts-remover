@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
 		<TargetFramework>net472</TargetFramework>
 		<Authors>Denis Zykov, ishatalkin, mgaffigan</Authors>
@@ -71,10 +71,10 @@
 		<None Remove="Temp\**" />
 	</ItemGroup>
 	<ItemGroup>
-		<PackageReference Include="ConsoleApp.CommandLine" Version="1.3.4" />
-		<PackageReference Include="Microsoft.Build" Version="16.6.0" />
-		<PackageReference Include="Microsoft.CodeAnalysis" Version="3.7.0" />
-		<PackageReference Include="ILRepack" Version="2.1.0-beta1" PrivateAssets="all" />
+    <PackageReference Include="ConsoleApp.CommandLine" Version="1.3.5" />
+    <PackageReference Include="Microsoft.Build" Version="16.8.0" />
+    <PackageReference Include="Microsoft.CodeAnalysis" Version="3.8.0" />
+    <PackageReference Include="ILRepack" Version="2.1.0-beta1" />
 	</ItemGroup>
 	<ItemGroup>
 		<Service Include="{508349b6-6b84-4df5-91f0-309beebad82d}" />
