@@ -8,12 +8,10 @@ namespace CodeContractsRemover
 {
 	public class ProjectContractRemover
 	{
-		private const string JbAnnotations = "JETBRAINS_ANNOTATIONS";
 		private readonly string _filePath;
 		private readonly AnnotationsMode _mode;
 		private readonly ProjectRootElement _project;
 		private bool _changed;
-		private bool _hadContracts;
 
 		/// <summary>Initializes a new instance of the <see cref="T:System.Object" /> class.</summary>
 		public ProjectContractRemover(string filePath, AnnotationsMode mode)
@@ -38,7 +36,7 @@ namespace CodeContractsRemover
 
 			RemoveCodeContracts();
 
-			if (_hadContracts && (_mode == AnnotationsMode.Add || _mode == AnnotationsMode.IncludeIntoBinaries))
+			if (_mode == AnnotationsMode.Add || _mode == AnnotationsMode.IncludeIntoBinaries)
 			{
 				AddAnnotations();
 			}
@@ -76,13 +74,7 @@ namespace CodeContractsRemover
 				var addDefaultConst = true;
 				foreach (var element in consts)
 				{
-					var currentValues = element.Value.Split(';');
-					if (!currentValues.Contains(JbAnnotations))
-					{
-						element.Value = $"{element.Value};{JbAnnotations}";
-						_changed = true;
-					}
-
+					element.Value = $"{element.Value};JETBRAINS_ANNOTATIONS";
 					if (string.IsNullOrEmpty(element.Parent.Condition))
 					{
 						addDefaultConst = false;
@@ -93,9 +85,10 @@ namespace CodeContractsRemover
 				{
 					//add const without conditions
 					var gr = _project.PropertyGroups.Where(g => string.IsNullOrEmpty(g.Condition)).First();
-					gr.AddProperty("DefineConstants", JbAnnotations);
-					_changed = true;
+					gr.AddProperty("DefineConstants", "JETBRAINS_ANNOTATIONS");
 				}
+
+				_changed = true;
 			}
 		}
 
@@ -118,13 +111,11 @@ namespace CodeContractsRemover
 					else if (constDefinition.Value.Contains("CONTRACTS_FULL;"))
 					{
 						_changed = true;
-						_hadContracts = true;
 						constDefinition.Value = constDefinition.Value.Replace("CONTRACTS_FULL;", string.Empty);
 					}
 					else if (constDefinition.Value.Contains(";CONTRACTS_FULL"))
 					{
 						_changed = true;
-						_hadContracts = true;
 						constDefinition.Value = constDefinition.Value.Replace(";CONTRACTS_FULL", string.Empty);
 					}
 				}
@@ -132,7 +123,6 @@ namespace CodeContractsRemover
 				foreach (var prop in propsToRemove)
 				{
 					_changed = true;
-					_hadContracts = true;
 					pg.RemoveChild(prop);
 				}
 			}

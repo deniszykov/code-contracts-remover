@@ -31,9 +31,6 @@
     <Compile Remove="TestCases\TestSubject.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="TestCases\ProjectNoCc.csproj">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
     <Content Include="TestCases\StringNotNullOrEmptyCase.cs">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
