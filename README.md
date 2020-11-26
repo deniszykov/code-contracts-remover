@@ -10,13 +10,17 @@ Installation
 ```
 Install-Package CodeContractsRemover
 ```
+or
+```
+Download and un-zip from https://www.nuget.org/api/v2/package/CodeContractsRemover 
+```
 
 Usage
 ============
 Tool is located at "PROJECT_DIR/packages/CodeContractsRemover.VERSION/tools/".
 
 ```bash
-CodeContractsRemover.exe <Convert|Remove> <directoryPath> [--searchPattern *.cs *.csproj] [--encoding utf-8] [--ignorePattern .svn/ ]
+CodeContractsRemover.exe <Convert|Stats> <directoryPath> [--searchPattern *.cs *.csproj] [--encoding utf-8] [--ignorePattern .svn/ ]
 ```
 Example
 ```bash
@@ -43,7 +47,7 @@ To run using [mono](http://www.mono-project.com/download/#download-lin) on Linux
 - Preserves all other [Contract](https://msdn.microsoft.com/en-us/library/system.diagnostics.contracts.contract(v=vs.110).aspx) invocations (including Attributes and Contract classes).
 - Removes CodeContract properties and constants from project files
 
-#### Mode - Remove
+~~#### Mode - Remove~~
 - Removes any [Contract](https://msdn.microsoft.com/en-us/library/system.diagnostics.contracts.contract(v=vs.110).aspx) invocations.
 - Invariant methods are preserved
 - Attributes and Contract classes are removed
@@ -74,3 +78,7 @@ Include annotations only for work in Visual Studio/Rider before compilation. Whe
 #### Mode - IncludeIntoBinaries
 Annotations will be included into binaries, so Rider/Re# would show hints before and after compilation (when binary is referenced into other project). This mode is recommended for packages. Read more on [Jet Brains site](https://blog.jetbrains.com/dotnet/2015/08/12/how-to-use-jetbrains-annotations-to-improve-resharper-inspections/).
 		
+# Contributors
+ * @ishatalkin
+ * @mgaffigan
+
