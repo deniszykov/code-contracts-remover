@@ -1,8 +1,8 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
 		<TargetFramework>net472</TargetFramework>
 		<Authors>Denis Zykov, ishatalkin, mgaffigan</Authors>
-		<Version>1.0.8</Version>
+		<Version>1.0.9</Version>
 		<PackageProjectUrl>https://github.com/deniszykov/code-contracts-remover</PackageProjectUrl>
 		<PackageLicenseUrl>https://raw.githubusercontent.com/deniszykov/code-contracts-remover/master/LICENSE</PackageLicenseUrl>
 		<Copyright>(c) Denis Zykov, ishatalkin, mgaffigan</Copyright>
@@ -17,7 +17,7 @@
 		<IsTool>true</IsTool>
 	
 </PropertyGroup>
-	<Target Name="Repack" AfterTargets="BuiltProjectOutputGroup" Condition=" '$(TargetFramework)' != '' AND '$(GeneratePackageOnBuild)' != '' ">
+	<Target Name="Repack" AfterTargets="BuiltProjectOutputGroup" Condition="' $(TargetFramework)' != '' AND '$(GeneratePackageOnBuild)' == 'true' ">
 		<GetFrameworkPath>
 			<Output TaskParameter="Path" PropertyName="FrameworkPath" />
 		</GetFrameworkPath>
@@ -48,6 +48,9 @@
 			<RepackTarget Include="$(TargetDir)System.Composition.Runtime.dll" />
 			<RepackTarget Include="$(TargetDir)System.Composition.TypedParts.dll" />
 			<RepackTarget Include="$(TargetDir)System.Memory.dll" />
+			<RepackTarget Include="$(TargetDir)System.Text.Encodings.Web.dll" />
+			<RepackTarget Include="$(TargetDir)System.Text.Json.dll" />
+			<RepackTarget Include="$(TargetDir)System.ValueTuple.dll" />
 			<RepackTarget Include="$(TargetDir)System.Numerics.Vectors.dll" />
 			<RepackTarget Include="$(TargetDir)System.Reflection.Metadata.dll" />
 			<RepackTarget Include="$(TargetDir)System.Runtime.CompilerServices.Unsafe.dll" />
